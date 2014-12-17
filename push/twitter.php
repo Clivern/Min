@@ -1,6 +1,6 @@
 <?php
 /**
- * Ant - Minimal WordPress Theme
+ * Min - Minimal WordPress Theme
  *
  * @author      Clivern <hello@clivern.com>
  * @copyright   2014 Clivern
@@ -10,8 +10,7 @@
  * @package     Ant
  */
 
-class Twitter extends WP_Widget
-{
+class Twitter extends WP_Widget {
 	/**
 	 * @var array a list of widget settings
 	 */
@@ -118,8 +117,7 @@ class Twitter extends WP_Widget
 		}
 
 		if ( !empty($tweets) ) {
-			foreach ( $tweets as
-					    $tweet ) {
+			foreach ( $tweets as $tweet ) {
 				$this->latest_tweet[ 'tweets' ][] = array(
 				  'text' => $this->update_urls($tweet->text),
 				  'time' => $tweet->created_at,
@@ -129,8 +127,7 @@ class Twitter extends WP_Widget
 				  'profile_image_url' => $tweet->user->profile_image_url,
 				);
 			}
-		}
-		else {
+		}else {
 			return false;
 		}
 		//set last check time
@@ -170,7 +167,6 @@ class Twitter extends WP_Widget
 			//decode results
 			$result = json_decode(wp_remote_retrieve_body($remote_get_tweets));
 			if ( !isset($result->access_token) ) {
-
 				return false;
 			}
 			$this->latest_tweet[ 'access_token' ] = $result->access_token;
@@ -219,8 +215,10 @@ class Twitter extends WP_Widget
 		$status = false;
 		//get current time
 		$now = time();
+		//get cached data
+		$this->get_options();
 		//check if last check was too late
-		if ( ($now - $this->latest_tweet[ 'last_check' ]) > $this->settings[ 'cache_interval' ] ) {
+		if ( (int) ($now - $this->latest_tweet[ 'last_check' ]) > (int) ($this->settings[ 'cache_interval' ]) ) {
 			//get access token
 			$access_token_status = $this->get_access_token();
 			//get tweets
@@ -237,26 +235,19 @@ class Twitter extends WP_Widget
 			//check if request is succeed
 			$status = ($access_token_status && $tweets_status && $update_status);
 		}
-		else {
-			//get widget options
-			$this->get_options();
-		}
 		//check if tweets exist
 		if ( empty($this->latest_tweet[ 'tweets' ]) ) {
 			//no tweets and error found ignore widget
 			echo $before_widget;
 			echo $after_widget;
-		}
-		else {
+		} else {
 			// it is the time to show widget
 			echo $before_widget;
 			//show widget title
 			echo $before_title . $this->settings[ 'title' ] . $after_title;
 			echo '<div class="dw-twitter-inner ' . (($this->settings[ 'show_follow' ]) ? 'has-follow-button' : '') . '" >';
 			//loop through tweets
-			foreach ( $this->latest_tweet[ 'tweets' ] as
-					    $key =>
-					    $tweet ) {
+			foreach ( $this->latest_tweet[ 'tweets' ] as $key => $tweet ) {
 				//show tweets in case of search
 				echo '<div class="tweet-item ' . $this->settings[ 'query_type' ] . '">';
 				if ( 'search' == $this->settings[ 'query_type' ] ) {
@@ -282,14 +273,14 @@ class Twitter extends WP_Widget
 			if ( 'user_timeline' == $this->settings[ 'query_type' ] ) {
 				echo '<div class="twitter-user">';
 				if ( $this->settings[ 'show_account' ] ) {
-					echo '<a href="https://twitter.com/' . $this->latest_tweet[ 'tweets' ][][ 'screen_name' ] . '" class="user">';
-					if ( $this->settings[ 'show_avatar' ] && $this->latest_tweet[ 'tweets' ][][ 'profile_image_url' ] ) {
-						echo '<img src="' . $this->latest_tweet[ 'tweets' ][][ 'profile_image_url' ] . '" width="16px" height="16px" >';
+					echo '<a href="https://twitter.com/' . $this->latest_tweet[ 'tweets' ][0][ 'screen_name' ] . '" class="user">';
+					if ( $this->settings[ 'show_avatar' ] && $this->latest_tweet[ 'tweets' ][0][ 'profile_image_url' ] ) {
+						echo '<img src="' . $this->latest_tweet[ 'tweets' ][0][ 'profile_image_url' ] . '" width="16px" height="16px" >';
 					}
-					echo '&nbsp;<strong class="name">' . $this->latest_tweet[ 'tweets' ][][ 'name' ] . '</strong>&nbsp;<span class="screen_name">@' . $this->latest_tweet[ 'tweets' ][][ 'screen_name' ] . '</span></a>';
+					echo '&nbsp;<strong class="name">' . $this->latest_tweet[ 'tweets' ][0][ 'name' ] . '</strong>&nbsp;<span class="screen_name">@' . $this->latest_tweet[ 'tweets' ][0][ 'screen_name' ] . '</span></a>';
 				}
 				if ( $this->settings[ 'show_follow' ] ) {
-					echo str_replace('__name__', $this->latest_tweet[ 'tweets' ][][ 'screen_name' ], $this->follow_button);
+					echo str_replace('__name__', $this->latest_tweet[ 'tweets' ][0][ 'screen_name' ], $this->follow_button);
 				}
 				echo '</div>';
 			}
