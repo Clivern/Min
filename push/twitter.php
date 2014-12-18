@@ -50,10 +50,10 @@ class Twitter extends WP_Widget {
 	function Twitter()
 	{
 		$widget_ops = array(
-		  'classname' => 'clivern_twitter_class',
+		  'classname' => 'null-instagram-feed',
 		  'description' => __('Display latest Tweets from Twitter', 'dw-kido') );
 
-		$this->WP_Widget('clivern_twitter', __('Twitter', 'dw-kido'), $widget_ops);
+		$this->WP_Widget('null-instagram-feed', __('Twitter', 'dw-kido'), $widget_ops);
 	}
 
 	/**
