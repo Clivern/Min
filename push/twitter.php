@@ -188,7 +188,7 @@ class Twitter extends WP_Widget {
 		$pattern = '/[^\s\t]{' . $maxLen . '}[^\s\.\,\+\-\_]+/';
 		$content = preg_replace($pattern, '$0 ', $content);
 		//
-		$pattern = '/\w{2,4}\:\/\/[^\s\"]+/';
+		$pattern = '/\w{2,5}\:\/\/[^\s\"]+/';
 		$content = preg_replace($pattern, '<a href="$0" title="" target="_blank">$0</a>', $content);
 		//search
 		$pattern = '/\#([a-zA-Z0-9_-]+)/';
