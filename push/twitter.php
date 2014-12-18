@@ -22,7 +22,7 @@ class Twitter extends WP_Widget {
 		'number' => 1,
 		'show_follow' => false,
 		'show_avatar' => false,
-		'show_account' => false,
+		'show_account' => true,
 		'consumer_key' => 'xy7rPUb9gb4OaHJZEXBdqw',
 		'consumer_secret' => 'lPNC14FQom8NW3Hd9PO5PVkWepV0lbFRTN30Zp538',
 		'exclude_replies' => true
@@ -50,10 +50,10 @@ class Twitter extends WP_Widget {
 	function Twitter()
 	{
 		$widget_ops = array(
-		  'classname' => 'null-instagram-feed',
+		  'classname' => 'dw_twitter latest-twitter',
 		  'description' => __('Display latest Tweets from Twitter', 'dw-kido') );
 
-		$this->WP_Widget('null-instagram-feed', __('Twitter', 'dw-kido'), $widget_ops);
+		$this->WP_Widget('clivern_twitter_widget', __('Twitter', 'dw-kido'), $widget_ops);
 	}
 
 	/**
@@ -80,14 +80,14 @@ class Twitter extends WP_Widget {
 		}
 		//build remote url
 		if ( $this->settings[ 'query_type' ] == 'user_timeline' ) {
-			$query = substr($query, 5);
-			$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' . rawurlencode($this->settings[ 'query' ]) . '&count=' . $this->settings[ 'number' ];
+			$query = substr($this->settings[ 'query' ], 5);
+			$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' . rawurlencode($query) . '&count=' . $this->settings[ 'number' ];
 			if ( $this->settings[ 'exclude_replies' ] ) {
 				$url .= '&exclude_replies=true';
 			}
 		}
 		else {
-			$url = 'https://api.twitter.com/1.1/search/tweets.json?q=' . rawurlencode($this->settings[ 'query' ]) . '&count=' . $this->settings[ 'number' ];
+			$url = 'https://api.twitter.com/1.1/search/tweets.json?q=' . rawurlencode($query) . '&count=' . $this->settings[ 'number' ];
 			if ( $this->settings[ 'exclude_replies' ] ) {
 				$url .= '&exclude_replies=true';
 			}
@@ -115,8 +115,8 @@ class Twitter extends WP_Widget {
 				$tweets = $result->statuses;
 			}
 		}
-
 		if ( !empty($tweets) ) {
+			$this->latest_tweet[ 'tweets' ] = array();
 			foreach ( $tweets as $tweet ) {
 				$this->latest_tweet[ 'tweets' ][] = array(
 				  'text' => $this->update_urls($tweet->text),
@@ -224,16 +224,7 @@ class Twitter extends WP_Widget {
 			//get tweets
 			$tweets_status = $this->get_tweets();
 			//update options
-			if ( $access_token_status && $tweets_status ) {
-				//update is fine
-				$update_status = $this->update_options();
-			}
-			else {
-				//error found
-				$update_status = false;
-			}
-			//check if request is succeed
-			$status = ($access_token_status && $tweets_status && $update_status);
+			$this->update_options();
 		}
 		//check if tweets exist
 		if ( empty($this->latest_tweet[ 'tweets' ]) ) {
@@ -261,7 +252,8 @@ class Twitter extends WP_Widget {
 					}
 					echo '</div>';
 				}
-				echo '<div class="tweet-content">' . $tweet[ 'text' ] . ' <span class="time"><a target="_blank" title="" href="' . $tweet[ 'url' ] . '"> about ' . human_time_diff(strtotime($tweet[ 'time' ]), time()) . ' ago</a></span></div>';
+
+				echo '<div class="tweet-content">' . $tweet[ 'text' ] . ' <span class="time"><a target="_blank" title="" href="' . $tweet[ 'url' ] . '"> about ' . human_time_diff( strtotime($tweet[ 'time' ]), time() ). ' ago</a></span></div>';
 				if ( 'search' == $this->settings[ 'query_type' ] ) {
 					if ( $this->settings[ 'show_follow' ] ) {
 						echo str_replace('__name__', $tweet[ 'screen_name' ], $this->follow_button);
