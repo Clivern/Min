@@ -47,7 +47,7 @@ class Twitter extends WP_Widget {
 	 * 
 	 * @since 1.0
 	 */
-	function Twitter()
+	function __construct()
 	{
 		$widget_ops = array(
 		  'classname' => 'dw_twitter latest-twitter',
